@@ -27,3 +27,5 @@ aspnetdb_log.ldf
 \#*\#
 
 .ionide/*
+.fake
+.ionide
