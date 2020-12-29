@@ -3,6 +3,7 @@ namespace Jejune
 module Files =
     open System.IO
     open System.Text.RegularExpressions
+    open System.Collections.Generic
 
     type PathChunk = 
         | Name of string
@@ -38,7 +39,9 @@ module Files =
     let getTemplatePath rootpath filepath = 
         let right = Path.GetRelativePath(rootpath, filepath)
         (filepath, splitChunks right)
-         
+
+    // let createFile
+
     let getAllTemplates rootdir = 
         
         allFiles [rootdir] |> Seq.choose (fun f -> match f with
@@ -60,16 +63,49 @@ module Files =
         use file = File.OpenText(path)
         deserialize(file.ReadToEnd())
 
-    let getChildObject (chunks: PathChunk array) (data: JsonValue) = 
-        let lst = List.ofArray chunks
+    let getChildObject (chunks: PathChunk seq) (data: JsonValue) = 
+        let lst = List.ofSeq chunks
         let rec child (l : PathChunk list) (data: JsonValue) =             
             match l.Head with
-            | FileVar (f, n) -> data.[n]
+            | FileVar (f, n) -> data.[f]
             | DirVar n -> child l.Tail data.[n]
             | Name n -> child l.Tail data
         child lst data
 
-    module Tests = 
+    let rec jsonArray (arr : JsonValue array):  obj array  = 
+        let s : (obj) seq = seq {
+            for e in arr do match e with              
+                                        | JsonValue.Null -> yield null
+                                        | JsonValue.Boolean b -> yield b
+                                        | JsonValue.String s -> yield s
+                                        | JsonValue.Float f -> yield f
+                                        | JsonValue.Number n -> yield n
+                                        | JsonValue.Array a -> yield jsonArray a :> obj              
+                                        | JsonValue.Record r -> yield jsonRecord r :> obj
+        }
+        s |> Seq.toArray
+
+    and jsonRecord (record : (string * JsonValue) array): IDictionary<string, obj>  = 
+
+        let s : (string * obj) seq = seq {
+                for n, v in record do match v with              
+                                        | JsonValue.Null -> yield (n, null)
+                                        | JsonValue.Boolean b -> yield (n, b :> obj)
+                                        | JsonValue.String s -> yield (n, s :> obj)
+                                        | JsonValue.Float f -> yield (n, f :> obj)
+                                        | JsonValue.Number d -> yield (n, d :> obj)
+                                        | JsonValue.Array a -> yield (n, jsonArray a :> obj)              
+                                        | JsonValue.Record r ->yield  (n, jsonRecord r :> obj)                   
+        } 
+        s |> dict
+
+    let jsonpropsToDict (jsonvalue: JsonValue) : IDictionary<string, obj>= 
+        
+        match jsonvalue with 
+            | JsonValue.Record r -> jsonRecord (jsonvalue.Properties())
+            | _ -> failwith "Data can only be an JsonObject"
+        
+    module Tests =  
         open NUnit.Framework        
         open System.IO
         
@@ -99,10 +135,10 @@ module Files =
             let templarr = Seq.toArray templates 
             let file, chunks = templarr.[1]
             
-            Assert.AreEqual([DirVar "level1"; FileVar ("filename", ".json")], chunks)
+            Assert.AreEqual([DirVar "level1"; FileVar ("level2", ".txt")], chunks)
             
         [<Test>]
-        let ``Get json deserialized object`` () =
+        let ``Get json deserialized objects`` () =
             let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"; "testdata.json" |]
 
             let ob = match getDataObject root with       
@@ -110,10 +146,7 @@ module Files =
                         | Error e -> failwith e.Message    
           
             Assert.AreEqual(10, ob.["int"].AsInteger())
-            let ob2 = getChildObject [|DirVar "level1"; Name "skip"; FileVar ("", "level2") |] ob
-            Assert.AreEqual(100, ob2.["int"].AsInteger())
-
-
-
+            let ob2 = getChildObject [|DirVar "level1"; Name "skip"; FileVar ("level2", ".txt") |] ob
+            Assert.AreEqual(1000, ob2.["int"].AsInteger())
 
 
