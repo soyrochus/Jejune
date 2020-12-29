@@ -46,43 +46,74 @@ module Files =
                                                    | _ -> None) 
                                                    |> Seq.map (fun e -> getTemplatePath rootdir e )
 
-   
-        //seq {
-        //    seq { DirVar "level1"; FileVar ("filename", ".json") }
-        //    seq { Name "testdata.json"}
-        //}
-
-module Tests = 
-    open NUnit.Framework
-    open Files
-    open System.IO
+    open FSharp.Data    
+    let deserialize<'a> str =
+        try
+          JsonValue.Parse(str)  
+          //JsonConvert.DeserializeObject<'a> str
+          |> Result.Ok
+        with
+          // catch all exceptions and convert to Result
+          | ex -> Result.Error ex  
     
-    [<Test>]
-    let ``Get all files recursively in test directory``() = 
-               
-        let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"|]
-        let files = allFiles [ root ]        
-        Assert.AreEqual(4, Seq.length files)
+    let getDataObject(path) = 
+        use file = File.OpenText(path)
+        deserialize(file.ReadToEnd())
 
-        let templates = getAllTemplates root 
-        Assert.AreEqual(2, Seq.length templates)
+    let getChildObject (chunks: PathChunk array) (data: JsonValue) = 
+        let lst = List.ofArray chunks
+        let rec child (l : PathChunk list) (data: JsonValue) =             
+            match l.Head with
+            | FileVar (f, n) -> data.[n]
+            | DirVar n -> child l.Tail data.[n]
+            | Name n -> child l.Tail data
+        child lst data
 
-    [<Test>]
-    let ``Get chunks from strings``() = 
+    module Tests = 
+        open NUnit.Framework        
+        open System.IO
         
-        Assert.AreEqual(DirVar "field", getChunk @"{field}")
-        Assert.AreEqual(FileVar ("field", ".cs"), getChunk @"{field}.cs.hbs")
-        
+        [<Test>]
+        let ``Get all files recursively in test directory``() = 
+                   
+            let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"|]
+            let files = allFiles [ root ]        
+            Assert.AreEqual(4, Seq.length files)
 
-    [<Test>]
-    let ``Get local templates with expansion variables in path names``() = 
+            let templates = getAllTemplates root 
+            Assert.AreEqual(2, Seq.length templates)
 
-        let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"|]
-         
-        let templates = getAllTemplates root 
+        [<Test>]
+        let ``Get chunks from strings``() = 
+            
+            Assert.AreEqual(DirVar "field", getChunk @"{field}")
+            Assert.AreEqual(FileVar ("field", ".cs"), getChunk @"{field}.cs.hbs")
+            
+        [<Test>]
+        let ``Get local templates with expansion variables in path names``() = 
 
-        let templarr = Seq.toArray templates 
-        let file, chunks = templarr.[1]
-        
-        Assert.AreEqual([DirVar "level1"; FileVar ("filename", ".json")], chunks)
-        
+            let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"|]
+             
+            let templates = getAllTemplates root 
+
+            let templarr = Seq.toArray templates 
+            let file, chunks = templarr.[1]
+            
+            Assert.AreEqual([DirVar "level1"; FileVar ("filename", ".json")], chunks)
+            
+        [<Test>]
+        let ``Get json deserialized object`` () =
+            let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"; "testdata.json" |]
+
+            let ob = match getDataObject root with       
+                        | Ok o -> o
+                        | Error e -> failwith e.Message    
+          
+            Assert.AreEqual(10, ob.["int"].AsInteger())
+            let ob2 = getChildObject [|DirVar "level1"; Name "skip"; FileVar ("", "level2") |] ob
+            Assert.AreEqual(100, ob2.["int"].AsInteger())
+
+
+
+
+

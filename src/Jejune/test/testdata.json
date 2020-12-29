@@ -1,1 +1,9 @@
-{}
+{
+    "str": "string",
+    "int": 10,
+    "level1": {        
+            "level2": {
+                "int": 100
+            }        
+    }
+}
