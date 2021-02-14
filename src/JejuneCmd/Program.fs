@@ -6,24 +6,17 @@ open HandlebarsDotNet
 
 open JejuneCmd
 open Gen
+open System.IO
     
 
 [<EntryPoint>]
 let main argv =
     
-    copyAndExpandFiles ["Test"] @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\template" @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation"
-    (*if argv.Length <> 3 then
-        printf "Invalid number of arguments"
-        printf "entity_file template_path destination_path"
-        -1
-    else
-        let entityfile = argv.[0]
-        let frompath = argv.[1]
-        let topath = argv.[2]
-        //copyAndExpandFiles "test" frompath topath
-        copyAndExpandFiles ["Test"] @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\template" @"c:/temp"
-        0
-    *)
+    let entities_path = @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\entities"
+    
+    let entities = load_entities(Path.Combine(entities_path, "entities.txt")) 
+    copyAndExpandFiles entities entities_path @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\template" @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation"
+    
     0
     
     

@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="JsonData.fs" />
     <Compile Include="Gen.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
