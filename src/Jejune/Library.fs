@@ -1,20 +1,30 @@
 ﻿namespace Jejune
 
-module Template =
+open Files
+open Gen
+open NUnit.Framework
 
-    open System.Text.RegularExpressions    
-    open HandlebarsDotNet
+module Main = 
 
-    let source = @"<div class=""entry"">
-        <h1>{{title}}</h1>
-        <div class=""body"">
-            {{body}}
-        </div>
-        </div>"
+    let expandTemplates datapath templateroot expandroot = 
+        ()
+        //let ob = match getDataObject datapath with       
+        //                | Ok o -> jsonpropsToDict o
+        //                | Error e -> failwith e.Message    
 
-    let template = Handlebars.Compile source
+        
+        //printf "print data object: %O" ob.Keys
 
-    let data = {|title = "My new post";    body = "This is my first post!"|}
-    
-    let test =
-        template.Invoke data
+        //let templates = getAllTemplates templateroot         
+
+        //for t in templates do 
+
+        //    printf "Template: %O" t
+            
+    module Tests = 
+        [<Test>]
+        let ``test full template expansion`` () = 
+            
+            //let root = Path.Combine [|__SOURCE_DIRECTORY__; "test"; "testdata.json" |]
+            ()
+ 

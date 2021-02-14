@@ -10,7 +10,10 @@ let from whom =
 [<EntryPoint>]
 let main argv =
     
-    let result = Jejune.Template.test
+    //let result = Jejune.Main.expandTemplates @"C:\src\Jejune\src\Jejune\test"
 
-    printfn "Generated:  %s" result
+    Jejune.Main.expandTemplates @"C:\src\Jejune\src\Jejune\test\testdata.json" @"C:\src\Jejune\src\Jejune\test" ""
+    //printfn "Generated:  %s" result
     0 // return an integer exit code
+
+    
