@@ -26,7 +26,7 @@ let expand_write_file (entity: Generic.IDictionary<string,obj>) (template: Handl
         Directory.CreateDirectory(dir) |> ignore
                 
     File.WriteAllText(_path, template.Invoke(entity))            
-       
+        
 let copyAndExpandFiles (entitielist: string list) (entities_path) (frompath: string) (topath: string) =
             
     let repo = load_template frompath "Data/Repositories/{{entity}}Repository.cs.hbs" 
@@ -44,7 +44,7 @@ let copyAndExpandFiles (entitielist: string list) (entities_path) (frompath: str
         let entitydata = match deserialize entityfile with       
                             | Ok o -> jsonpropsToDict o
                             | Error e -> failwith e.Message
-                     
+                              
         expand_write_file entitydata repo topath "Data/Repositories/{{entity}}Repository.cs"
         expand_write_file entitydata irepo topath "Domain/RepositoryInterfaces/I{{entity}}Repository.cs"
         expand_write_file entitydata dto topath "Business/{{entity}}Management/Dto/{{entity}}Dto.cs"
