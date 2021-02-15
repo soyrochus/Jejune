@@ -9,12 +9,11 @@ open JsonData
 let load_entities path = 
 
         use f = File.OpenText(path)
-        let txt = f.ReadToEnd ()        
+        let txt = (f.ReadToEnd ()).Trim()        
         let lst = List.ofArray(txt.Split( Environment.NewLine, StringSplitOptions.None))
         List.map (fun (x: string) -> x.Trim()) lst
 
-let load_template base_path path =
-    
+let load_template base_path path =    
     use f = File.OpenText(Path.Combine(base_path, path))
     Handlebars.Compile(f.ReadToEnd())
    
@@ -27,7 +26,7 @@ let expand_write_file (entity: Generic.IDictionary<string,obj>) (template: Handl
                 
     File.WriteAllText(_path, template.Invoke(entity))            
         
-let copyAndExpandFiles (entitielist: string list) (entities_path) (frompath: string) (topath: string) =
+let copyAndExpandFiles (entitielist: string list) (entities_path: string) (frompath: string) (topath: string) =
             
     let repo = load_template frompath "Data/Repositories/{{entity}}Repository.cs.hbs" 
     let irepo = load_template frompath "Domain/RepositoryInterfaces/I{{entity}}Repository.cs.hbs"

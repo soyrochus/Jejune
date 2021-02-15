@@ -12,11 +12,11 @@ open System.IO
 [<EntryPoint>]
 let main argv =
     
-    let entities_path = @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\entities"
-    
-    let entities = load_entities(Path.Combine(entities_path, "entities.txt")) 
-    copyAndExpandFiles entities entities_path @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\template" @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation"
-    
+    let entities_path = @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\entities"    
+    let entities = load_entities(Path.Combine(entities_path, "entities.txt"))
+    let templates_path = @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation\template"
+    let source_path = @"C:\src\CASO-Backend\source\Templates\WebAPI\Devon4Net.WebAPI.Implementation"
+    copyAndExpandFiles entities entities_path  templates_path source_path    
     0
     
     
