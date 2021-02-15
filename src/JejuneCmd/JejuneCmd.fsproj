@@ -10,11 +10,7 @@
     <Compile Include="Gen.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Jejune\Jejune.fsproj" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Fsharp.Data" Version="3.3.3" />
     <PackageReference Include="Handlebars.Net" Version="2.0.4" />
