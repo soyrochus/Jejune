@@ -54,14 +54,3 @@ let copyAndExpandFiles (entitielist: string list) (entities_path: string) (fromp
         expand_write_file entitydata iservice topath "Business/{{entity}}Management/Services/I{{entity}}Service.cs"
 
         
-(*
-Data/Repositories/{{entity}}Repository.cs
-Domain/RepositoryInterfaces/I{{entity}}Repository.cs
-
-Business/{{entity}}Management/Controllers/{{entity}}Controller.cs
-Business/{{entity}}Management/Converters/{{entity}}Converter.cs
-Business/{{entity}}Management/Dto/{{entity}}Dto.cs
-Business/{{entity}}Management/Services/{{entity}}Service.cs
-Business/{{entity}}Management/Services/I{{entity}}Service.cs
-        
-*)
